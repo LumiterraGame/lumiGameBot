@@ -1,4 +1,4 @@
-## 时间: 2026-03-18 17:46:03 CST
+## 时间: 2026-03-18 20:23:30 CST
 
 ## 任务: AI真实行为赚钱Bot全局总策略
 
@@ -6,184 +6,135 @@
 
 ## 目标
 
-定义 AI 真实行为赚钱 Bot 的全局总策略，明确产品最终形态、系统边界、核心能力、阶段路线与关键风险，并把“Bot 行为由 AI（GPT / Claude / 其他模型）驱动”收敛成正式前提，确保后续架构设计、Phase 0 / Phase 1 拆解和实现方向不再摇摆。
+定义 AI 真实行为赚钱 Bot 的总体规划和产品形态，只回答“这个产品最终是什么、给谁用、解决什么问题、用户怎么使用、版本怎么进化”这类产品级问题，不在本文件中讨论具体技术落地、框架边界、协议实现和开发排期。
 
 ## 范围内
 
-- 明确最终产品形态为 `Web 控制台 + Node Agent + Bot Runtime`。
-- 明确 Bot 运行在用户指定机器上，统一抽象为 `Node`，覆盖：
+- 明确产品核心目标：
+  - Bot 行为由 AI（`GPT / Claude / 其他模型`）驱动
+  - 目标是让 Bot 在游戏和链上环境中自主决策并追求收益
+  - 用户能看、能控、能接管
+- 明确最终产品形态：
+  - 用户在 `Web` 端配置和管理
+  - Bot 运行在用户指定机器上
+  - 用户可实时查看 Bot 行为并进行控制
+- 明确用户使用方式：
   - 本地电脑
   - 用户自己的云服务器
-- 明确 `iPad / 手机 / 浏览器` 先作为控制端，而不是正式执行端。
-- 明确客户端接入方向为“网关协议优先，客户端兼容”，不把内部 service RPC 误当客户端协议。
-- 明确 `Unity client` 的角色是：
-  - 协议确认工具
-  - 地图/寻路/行为语义参考工具
-  - 高保真预览候选 sidecar
-- 明确“合成业务”是混合链路，不是单一协议：
-  - `已解锁配方` 当前走 game channel 的 `QueryUserRecipe`
-  - `排队合成 / 查询 pending merges / 取消 / 提取 / 非同质化材料需求 / token allowance` 当前走客户端 Runtime GraphQL -> `services/graphql-service`
-  - 因此 Bot 不能假设所有游戏行为都只经过网关 socket
-- 明确 Bot 的行为主导权属于 AI：
-  - AI 负责决定“接下来做什么”
-  - 确定性 Runtime 负责决定“如何安全执行”
-  - 规则和风控是护栏，不是最终行为来源
-- 明确 Bot 需要具备的能力：
-  - 账号与钱包
-  - 世界状态建模
-  - 静态知识装载
-  - 游戏内执行
-  - 链上与经济执行
-  - 赚钱决策
-  - AI 决策层
-  - 拟人化行为层
+  - `iPad / 手机 / 浏览器` 作为控制端
+- 明确产品能力视角下的核心能力：
+  - 账号与钱包管理
+  - AI 驱动决策
+  - 游戏内行为执行
+  - 链上经济行为执行
+  - 收益判断与风险控制
   - 实时观察与人工接管
-  - 多 Agent 协作
-  - 风控与可运维
-- 明确版本演进方向：
-  - `v1` 语义直播
-  - `v2` 轻量场景预览
-  - `v3` 高保真场景预览
-- 明确推荐阶段计划与第一版 MVP 范围。
+  - 多 Bot / 多角色长期运行
+- 明确产品演进方向：
+  - `v1`：先解决“能用”
+  - `v1` 的具体目标是：
+    - 能配置
+    - 能运行
+    - 能进入游戏
+    - 能被看见
+    - 能被控制
+  - `v2`：更强的场景感知和轻量可视化
+  - `v3`：高保真观察与更完整的人机协作
+- 明确第一版产品边界：
+  - 单节点
+  - 单 Bot
+  - 单条收益闭环
+  - 可观察、可暂停、可恢复、可接管
 
 ## 范围外
 
-- 不在本文件中细拆具体协议字段、消息包和 protobuf 对照表。
-- 不在本文件中拆到仓库级开发任务、接口级任务或代码改动级任务。
-- 不在本文件中决定 Unity sidecar 或专门 renderer 的具体实现方案。
-- 不在本文件中决定第一条收益闭环的最终业务选择。
+- 不在本文件中讨论具体协议、接口、消息包和代码结构。
+- 不在本文件中讨论仓库依赖、模块边界或技术组件命名。
+- 不在本文件中拆解开发顺序、里程碑和工程任务。
+- 不在本文件中决定具体框架、语言、部署细节或实现路径。
 
 ## 任务拆解（按顺序执行）
 
-1. 锁定系统边界，确认 `game-services-v2`、`scene-server-v2`、`unity-client-v2`、`theweb3-v2`、`contracts-monad-v2`、`service-xlsx-tool-v2`、`services` 在方案中的职责。
-2. 锁定接入原则，明确 Unity 客户端经由网关接入，`user_agent_module` 只是服务间路由记录，不是客户端入口。
-3. 锁定“混合接入矩阵”，明确至少有两类正式客户端链路：
-   - game channel / gateway socket
-   - runtime GraphQL / `services/graphql-service`
-4. 明确产品形态，确定正式方向为 `Web 控制台 + Node Agent + Bot Runtime`。
-5. 明确 Bot 的完整能力清单，包括钱包、状态、AI 驱动决策、执行、风控、观察控制和多 Agent 协作。
-6. 明确推荐系统结构，包括：
-   - `web-control-plane`
-   - `node-agent`
-   - `bot-runtime`
-   - `bot-session-manager`
-   - `gateway-client-adapter`
-   - `runtime-graphql-adapter`
-   - `service-read-adapter`
-   - `auth-adapter`
-   - `identity-adapter`
-   - `web3-adapter`
-   - `world-model`
-   - `planner`
-   - `policy-engine`
-   - `liveops-stream`
-   - `preview-layer`
-   - `simulator`
-   - `metrics`
-7. 明确产品发布方向，统一以 `Node` 为抽象，不区分“用户本地机器”和“用户自己的云服务器”的产品语义。
-8. 明确版本演进：
-   - `v1` 先做语义直播和基础人工控制
-   - `v2` 再做轻量场景预览
-   - `v3` 最后评估高保真预览
-9. 明确阶段计划：
-   - `Phase 0` 打通协议与状态
-   - `Phase 1` 单 Node + 单 Bot MVP
-   - `Phase 2` 多 Session 与轻量预览
-   - `Phase 3` AI 策略层与拟人化
-   - `Phase 4` 高保真观察层与多 Agent 协作
-10. 明确第一版 MVP 边界：
-   - 1 个 `Node`
-   - 1 个 Bot
-   - 1 条明确收益链
-   - `v1` 级别的可观察、可暂停、可恢复
+1. 明确产品要解决的问题：不是做一个脚本，而是做一个 AI 驱动、可观察、可控制、以收益为目标的 Bot 产品。
+2. 明确目标用户与使用场景：
+   - 自己在本地或云上运行 Bot 的用户
+   - 需要低上手成本、可远程管理和可实时查看的用户
+3. 明确最终产品形态：
+   - `Web` 作为统一入口
+   - 用户机器作为运行载体
+   - Bot 作为长期运行的 AI 执行体
+4. 明确产品级核心能力清单：
+   - 配置
+   - 运行
+   - 观察
+   - 控制
+   - 赚钱
+   - 风控
+5. 明确用户信任机制：
+   - Bot 决策可解释
+   - 行为可追踪
+   - 高风险动作可人工干预
+   - 用户保有最终控制权
+6. 明确版本演进路线：
+   - `v1` 先解决“能用”
+   - `v2` 再解决“更好看、更好懂”
+   - `v3` 再解决“更强沉浸感和更强协作”
+7. 明确第一版 MVP 的产品边界，且所有待确认项都以“不阻塞 `v1` 先解决能用”为裁剪原则，避免一开始做成“全能力平台”。
+8. 明确产品级主要风险和待确认项，为后续架构与开发计划提供稳定前提。
 
 ## 关键依赖（系统/服务/数据）
 
-- `/Users/44alex/work/meland/odyssey-v2/game-services-v2`
-  - 用户主数据、任务、天赋、场景切换、网关路由语义、`cli_web3_proxy`
-- `/Users/44alex/work/meland/odyssey-v2/scene-server-v2`
-  - `world / home / dungeon` 场景运行
-- `/Users/44alex/work/meland/odyssey-v2/unity-client-v2`
-  - 真实客户端网络层、GraphQL 入口、动作语义参考
-  - 合成业务相关动作：
-    - `QueryUserRecipeAction`
-    - `UseRecipesAction`
-    - `GetUserPendingMerges`
-    - `CancelMergeWithBatchIdAction`
-    - `ExtractMergeWithBatchIdAction`
-    - `GetMergeNeedsNonFungibleAction`
-    - `GetUserGameTokenAllowanceAction`
-    - `GetUserGameInternalTokenAction`
-- `/Users/44alex/work/meland/odyssey-v2/theweb3-v2`
-  - 链相关聚合能力
-- `/Users/44alex/work/meland/odyssey-v2/contracts-monad-v2`
-  - 最终经济规则
-- `/Users/44alex/work/meland/odyssey-v2/service-xlsx-tool-v2`
-  - 静态配置与知识输入源
-- `/Users/44alex/work/meland/odyssey-v2/services`
-  - `graphql-service`、`user-service`、`backend-common`
-  - `loginByMetamask`、`authByMetamask`、`loginByTemporaryToken`
-  - `profile`、`getUserWallets`、`web3Profile`
-  - 合成业务 GraphQL 入口：
-    - `useRecipeMerge2Queue`
-    - `getUserPendingMerges`
-    - `cancelMergeWithBatchId`
-    - `extractMergeWithBatchId`
-    - `getMergeNeedsNonFungible`
-    - `getUserUnlockedRecipes`
-  - `graphql-service/recipe.service` 再通过 Dapr 调 `web3-service` 的：
-    - `merge2Queue`
-    - `getPendingMerges`
-    - `cancelMerge`
-    - `extractMerge`
-    - `getMergeNeedsNonFungible`
-    - `GetUserRecipes`
+- 游戏本身存在可重复验证的收益路径，否则产品价值无法成立。
+- 用户能够提供至少一台可运行 Bot 的机器：
+  - 本地电脑
+  - 用户自己的云服务器
+- 用户可接受以 `Web` 作为统一入口，而不是以重客户端作为主要使用方式。
+- 用户需要实时查看与人工控制能力，否则长期托管 Bot 的信任基础不足。
+- 可用的 AI 模型服务在成本、时延和稳定性上能够支撑产品运行。
 
 ## 风险与缓解
 
-- 如果误把内部 service RPC 当客户端接入协议，后续实现会偏掉。  
-  缓解：坚持“网关协议优先”，后台读接口只做辅助补齐。
-- 如果忽略“合成业务”的混合链路，只做 gateway socket，会导致合成、队列查询、取消、提取这条链路缺失。  
-  缓解：在架构上显式加入 `runtime-graphql-adapter`，把合成视为混合接入特例。
-- 如果把 Unity 当最终执行内核，后面在发布、多开、托管、扩展上会越来越重。  
-  缓解：Unity 只作为参考客户端和潜在 sidecar，不作为正式运行时。
-- 如果直接让 LLM 控底层动作，成本和不稳定性都会过高。  
-  缓解：LLM 只输出结构化计划，执行层只接受受限 DSL。
-- 如果把 AI 降级成可选项，最后很容易退化成规则脚本，不符合目标。  
-  缓解：从全局策略开始就把“AI 驱动行为”写成正式前提，规则层只做边界与兜底。
-- 如果没有静态配置知识库，Bot 无法判断任务、地图、副本和活动的收益性。  
-  缓解：把 `service-xlsx-tool-v2` 导出的配置转成可查询索引。
-- 如果没有硬风控，提现、交易、质押会放大损失。  
-  缓解：预算、白名单、审批、限额、kill switch 一开始就要进入方案。
-- 如果把 Web 当执行端，而不是控制端，后面会卡在浏览器权限、保活、长连接和跨设备控制上。  
-  缓解：执行端统一落到 `Node Agent`。
-- 如果让预览层成为状态真源，后面会出现执行与画面分裂。  
-  缓解：`Bot Runtime` 永远是执行真身，`Preview` 永远只消费状态流。
+- 如果产品目标一开始就同时覆盖太多玩法、太多角色和太多收益路线，范围会失控。  
+  缓解：第一版严格限制为单节点、单 Bot、单条收益闭环。
+- 如果用户上手成本太高，产品形态会被重客户端或手工部署拖累。  
+  缓解：坚持 `Web` 统一入口和低门槛配置体验。
+- 如果 Bot 不是明确的 AI 驱动，而是退化成规则脚本，产品差异化会消失。  
+  缓解：从总策略开始就把“AI 驱动行为”写成正式前提。
+- 如果用户看不懂 Bot 在做什么，就不会放心长期运行。  
+  缓解：把“可观察、可控制、可接管”定义成产品必需能力。
+- 如果过早追求高保真预览，产品会被视觉层拖慢。  
+  缓解：先解决 `v1` 可用性，再逐步提升可视化和沉浸感。
+- 如果没有稳定收益闭环，产品会变成“能跑但没有价值”的演示系统。  
+  缓解：尽早锁定一条可计算成本和收益的验证路径。
 
 ## 验收标准
 
-- 文档明确给出正式产品形态：`Web 控制台 + Node Agent + Bot Runtime`。
-- 文档明确给出执行端所在位置：用户指定机器，统一抽象为 `Node`。
-- 文档明确写清 `Unity client` 不是最终执行内核。
-- 文档明确写清 Bot 的行为由 AI（GPT / Claude / 其他模型）驱动，而不是纯规则脚本。
-- 文档明确写清“网关协议优先，客户端兼容”的接入原则。
-- 文档明确写清“合成业务”是 game channel + runtime GraphQL 的混合链路。
-- 文档明确覆盖 Bot 的完整能力清单，而不是只描述赚钱脚本。
-- 文档明确覆盖 `v1 / v2 / v3` 的演进方向。
-- 文档明确覆盖 `Phase 0` 到 `Phase 4` 的阶段路线。
-- 文档明确覆盖第一版 MVP 边界。
-- 文档明确保留实时观察与人工接管能力，不把它降级成可选功能。
+- 文档只聚焦总体规划和产品形态，不展开技术实现与工程排期。
+- 文档明确 Bot 是 AI 驱动，而不是规则脚本驱动。
+- 文档明确产品最终使用方式是：
+  - `Web` 配置与管理
+  - 用户机器运行 Bot
+  - 用户远程观察和控制
+- 文档明确 `v1 / v2 / v3` 的产品级演进方向。
+- 文档明确第一版 MVP 的产品边界。
+- 文档明确用户信任与人工控制是正式产品能力，而不是可选增强项。
+
+## v1基础版本收敛结论
+
+- `v1` 的总原则：
+  - 先解决“能用”
+  - 所有不阻塞“能配置、能运行、能进入游戏、能被看见、能被控制”的能力，原则上延后到 `v2 / v3`
+- `v1` 第一条优先验证的收益闭环：
+  - 先以“合成业务”作为首条收益闭环
+- `v1` 第一版主要目标用户：
+  - 优先面向有本地常开电脑或自有云服务器、能接受安装 `Node Agent` 的重度用户
+- `v1` 默认的人机关系：
+  - 以“用户观察为主”作为默认模式
+  - 用户保留暂停、恢复和随时接管的权利
+- `v1` 高风险动作默认策略：
+  - 默认要求人工审批
 
 ## 待确认问题
 
-- 第一条赚钱闭环优先验证哪条：
-  - `任务/副本`
-  - `equipment recovery`
-  - `task pool`
-  - `marketplace`
-  - `puzzle stake / Lumonad`
-- 第一版 headless client 是否直接从协议重写开始，还是先局部复用 Unity 网络层语义。
-- 第一版节点端是否默认只支持桌面 / 云服务器，不承诺 iPad 执行。
-- 高风险动作是否默认人工审批，例如提现、市场成交、大额质押。
-- 第一版实时观察是否只做“语义直播”，暂不承诺高保真渲染。
-- 第一版是否把“合成业务”列入 MVP 支持范围，还是先只在 plan 中预埋 `runtime-graphql-adapter`。
+- 当前围绕 `v1` 基础版本，无新增待确认问题。
+- 超出 `v1` 基础版本范围的内容，统一放到 `v2 / v3` 再评估。
