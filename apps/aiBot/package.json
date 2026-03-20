@@ -1,0 +1,41 @@
+{
+  "name": "ai-bot",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.8",
+    "drizzle-orm": "^0.36.4",
+    "next": "^14.2.24",
+    "pg": "^8.13.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-qr-code": "^2.0.18",
+    "viem": "^2.39.3",
+    "wagmi": "^2.16.3",
+    "zod": "^3.24.1",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@types/node": "^22.10.1",
+    "@types/pg": "^8.11.10",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.24",
+    "jsdom": "^25.0.1",
+    "node-mocks-http": "^1.16.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

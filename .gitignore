@@ -1,0 +1,10 @@
+.next
+node_modules
+apps/*/.next
+apps/*/node_modules
+.env.local
+.env
+coverage
+dist
+yarn-error.log
+**/*.tsbuildinfo

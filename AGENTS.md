@@ -1,56 +1,68 @@
 # Repository Guidelines
 
 ## 项目定位与规划依据
-本仓库当前承载 `AIBot(机器人)` 的 `Web` 创建与管理、`AI Brain Service(AI大脑)` 相关逻辑模块、`AI Gateway`、数据库访问层以及共享消息结构。术语、边界和开发顺序以 `plans/001` 到 `plans/005` 为准；如果 `plans/` 更新了命名或目录结论，`AGENTS.md` 也必须同步更新。
 
-当前正式术语优先使用 `AIBot(机器人)`、`AI Brain Service(AI大脑)`、`AI Gateway`、`AuthSession`、`AIBotPolicyState`。不要继续在新文档或新代码中沿用旧的 `Bot AI Brain`、`brain-web`、`brain-domain`、`apps/packages` monorepo 说法。
+本仓库 `lumiGameBot` 当前主要交付 **`apps/aiBot`**：`AIBot(机器人)` 的 Web 创建与管理（`Next.js` + `pages/api` + `PostgreSQL`）、钱包连接（`wagmi`）与领域消息类型。产品愿景与平台侧总架构仍以 **`plans/001`～`plans/005`** 为准；`plans/` 与代码不一致时，**先改 `plans/` 再改本文件**。
 
-## 仓库边界与目录组织
-当前仓库优先采用类似 `lumiterrator-v2` 的单应用工程形态，而不是多应用 monorepo。正式游戏执行和 `Unity Agent` 仍在 `/Users/44alex/work/meland/odyssey-v2/unity-client-v2`，不要把 Unity 运行时代码直接迁入本仓库。
+术语优先使用 **`AIBot(机器人)`**、**`AI Brain Service(AI大脑)`**、**`AI Gateway`**、**`AIBotPolicyState`** 等（见各 plan）。勿在新文档中沿用旧称 `brain-web`、`brain-domain`、`apps/packages` monorepo。
 
-当前目标目录以 `src/` 为中心：
+## 仓库边界
 
-- `src/pages`：页面入口，同时包含 `pages/api`
-- `src/message`：request / response / DTO / shared message types
-- `src/db`：`Prisma` 初始化、`PostgreSQL` 连接与健康探针
-- `src/dbInterface`：数据访问封装
-- `src/aibot`：钱包登录、`AIBot(机器人)` 创建与管理逻辑
-- `src/aiBrainService`：`AI Brain Service(AI大脑)` 逻辑模块
-- `src/ai`：provider 抽象、`ai-gateway`、cost governor
-- `src/lib`：logger、env、errors、ids
-- `src/components`、`src/hooks`、`src/styles`
-- `prisma/`、`scripts/`、`plans/`
+- **本仓库**：`apps/aiBot`（主应用）+ `apps/aiBrainService`（占位）+ `plans/`。
+- **不在本仓库**：`Unity Client` / 游戏运行时（路径仍为 **`/Users/44alex/work/meland/odyssey-v2/unity-client-v2`**），勿迁入 Unity 代码。
 
-## 开发、构建与数据库命令
-统一使用 `yarn`：
+## `apps/aiBot` 目录（以 `src/` 为中心）
 
-- `yarn install`
-- `yarn dev`
-- `yarn build`
-- `yarn lint`
-- `yarn test`
-- `yarn db:migrate`
-- `yarn db:seed`
+路径均相对于 `apps/aiBot/`：
 
-目标开发体验是一条 `yarn dev` 同时支撑页面、`pages/api` 和数据库连接。若脚本语义变更，先改 `plans/003` 或 `plans/004`，再更新本文件。
+| 目录 | 说明 |
+|------|------|
+| `src/pages` | 页面与 **`pages/api`**（`/` 控制台、`/health`、`/api/bots/*`、`/api/health`、`/api/db/health`） |
+| `src/message` | DTO / 领域枚举（`message.ts`、`data.ts`） |
+| `src/db` | `pg`、`drizzle-orm`、`schema.ts`、**手动 SQL** `001_init_aibot_tables.sql`、`db-smoke`（健康探针） |
+| `src/dbInterface` | 数据访问（`aibot.ts`、`interface.ts`） |
+| `src/lib` | `env`、`api`、`http-errors`、`requestJson`、`wallet/*`（链与 `wagmi`）等 |
+| `src/components` | 如 `WalletModal` |
+| `tests` | Vitest：`api-bots`、`home-console` |
 
-## 编码与命名规范
-默认使用 `TypeScript`，统一 2 空格缩进。命名应与最新 plans 保持一致，例如 `AIBot`、`AIBotPolicyState`、`AuthSession`、`DecisionJournal`、`PnLLedger`。
+**已不存在的占位目录（勿再建空壳）**：`src/aibot`、`src/server`、`src/request`、`src/upstream`、`src/aiBrainService`（与 **`apps/aiBrainService`** 独立应用区分）。
 
-页面和 API 放在 `src/pages`；DTO 和消息定义放在 `src/message`；数据库访问统一收口到 `src/dbInterface`；`AIBot(机器人)` 业务逻辑放在 `src/aibot`；`AI Brain Service(AI大脑)` 相关逻辑放在 `src/aiBrainService`。不要把数据访问、页面状态和 AI 逻辑混写在同一个模块里。
+**`apps/aiBrainService`**：同级占位应用，后续承接 AI Brain 相关逻辑；**不是** `apps/aiBot/src` 下的子目录。
 
-## 测试与验收要求
-优先覆盖以下约束：
+## 当前实现要点（与 `plans/005` 一致）
 
-- 钱包签名登录和 `AuthSession` 建立
-- 当前钱包查询、创建、更新自己的 `AIBot(机器人)`
-- 一钱包只能存在一个 `AIBot(机器人)`
-- `AIBotPolicyState` 持久化正确
-- `/api/health` 与数据库健康探针可用
+- **无**服务端钱包签名会话、**无** `/api/auth/*`；`POST/PATCH /api/bots/*` 依赖请求体 **`walletAddress`**（信任前端，生产需另加鉴权）。
+- 数据库：**非 Prisma**；用 `drizzle` + 手工执行/维护 SQL。
+- 环境变量：`AIBOT_POSTGRES_*`；可选 `NEXT_PUBLIC_CHAIN_ID`、`NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`（默认见 `src/lib/wallet/chain.ts`、`config.ts`）
 
-涉及数据库改动时，必须同时提交 `prisma` schema、migration 或 seed 更新。若暂时没有自动化测试，PR 中必须写明钱包登录、`AIBot(机器人)` 创建/编辑、API 鉴权和数据库连接的手工验证步骤。
+## 开发、构建与数据库
 
-## 提交、PR 与安全要求
-提交信息继续使用简洁英文前缀，如 `docs:`、`feat:`、`fix:`、`refactor:`、`chore:`。PR 需要写清关联的 `plans/*` 文档、影响的 `src/*` 目录、接口或数据库变更、环境变量变更以及验证结果。
+在**仓库根目录**（workspace）：
 
-禁止提交私钥、钱包导出、模型厂商 key、数据库凭据或真实 session token。所有 `AIBot(机器人)` 相关 API 默认依赖当前钱包登录态，不允许匿名访问；涉及审批规则、AI 预算、风控默认值或链上动作的改动，按高风险变更处理。
+```bash
+yarn install
+yarn dev:aiBot      # 启动 apps/aiBot
+yarn build          # 构建 ai-bot
+yarn lint
+yarn test
+```
+
+`apps/aiBot` 内也可 `yarn dev` / `yarn build`。数据库表请按 `src/db/001_init_aibot_tables.sql` **手工执行**（或团队约定迁移流程）；**根目录未提供 `db:migrate`**。
+
+## 编码规范
+
+- 默认 **TypeScript**，2 空格缩进。
+- 页面与 API 放 `src/pages`；DTO 放 `src/message`；DB 访问只经 **`src/dbInterface`**；勿把 DB 与 UI 状态混在同一模块。
+
+## 测试与验收
+
+- 自动化：`yarn test`（`apps/aiBot/tests`）。
+- 业务上建议验证：连接钱包、`AIBot` 查询/创建/更新、一钱包一机器人、`/api/health` 与 `/api/db/health`。
+- 数据库变更需同步 **`schema` / SQL** 与必要说明。
+
+## 提交、PR 与安全
+
+- 提交前缀：`docs:`、`feat:`、`fix:`、`refactor:`、`chore:` 等。
+- PR 写明关联 **`plans/*`**、影响路径、接口/DB/环境变量变更与验证方式。
+- **禁止**提交私钥、助记词、模型 key、数据库密码、真实 session。  
+- 当前 **`create/update` 为信任前端钱包字段**；若改为强鉴权，属高风险变更，需单独设计与评审。

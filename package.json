@@ -1,0 +1,15 @@
+{
+  "name": "lumi-game-bot",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:aiBot": "yarn workspace ai-bot dev",
+    "dev:aiBrainService": "yarn workspace ai-brain-service dev",
+    "build": "yarn workspace ai-bot build",
+    "lint": "yarn workspace ai-bot lint",
+    "test": "yarn workspace ai-bot test"
+  }
+}
