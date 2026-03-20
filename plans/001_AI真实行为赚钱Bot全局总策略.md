@@ -52,11 +52,11 @@
 - 最终产品形态：
   - 正式游戏执行入口是带有内嵌 `Agent` 层的 `Unity Client`。
   - `Unity Client` 同时承担游戏执行、可视化观察和人工接管。
-  - `Web` 侧承担 `Bot AI Brain` 的创建与管理，不承担正式游戏执行。
-  - 平台侧统一提供 `AI Gateway / Brain Service` 与相关支撑能力。
+  - `Web` 侧承担 `AIBot(机器人)` 的创建与管理，不承担正式游戏执行。
+  - 平台侧统一提供 `AI Gateway / AI Brain Service(AI大脑)` 与相关支撑能力。
 - 用户使用方式：
   - 用户下载并使用带有 `BotAgent` 能力的 `Unity Client` `发布包`或者`网页版`。
-  - 用户先在 `Web` 创建当前钱包对应的 `Bot AI Brain`，并完成初始策略模板、阶段性策略规则、风控规则、AI 费用相关配置。
+  - 用户先在 `Web` 创建当前钱包对应的 `AIBot(机器人)`，并完成初始策略模板、阶段性策略规则、风控规则、AI 费用相关配置。
   - 用户进入游戏客户端后点击 `AI Agent`，客户端会自动读取当前钱包对应的 `Brain` 信息。
   - 如果当前钱包尚未创建 `Brain`，客户端展示“去 `Web` 创建”和“重新加载”入口，由用户在 `Web` 完成创建后回到客户端手动重新加载。
   - 如果当前钱包已存在 `Brain`，客户端直接加载该 `Brain` 的配置并进入 `BotAgent` 面板。
@@ -120,7 +120,7 @@
 - `Unity Client` 是正式游戏执行入口。
 - `Web` 是正式 `Brain` 创建、管理、复盘和 `AI` 费用入口。
 - 当前平台侧保留必要的云能力：
-  - `AI Gateway / Brain Service`
+  - `AI Gateway / AI Brain Service(AI大脑)`
   - `Brain` 创建与管理
   - 配置存储
   - 决策日志
@@ -293,7 +293,7 @@
 - 文档明确当前产品采用 `Web 创建与管理 Brain + Unity 执行与接管 Bot` 的双入口形态。
 - 文档明确 `Unity Client` 承担游戏执行、可视化观察和人工接管。
 - 文档明确 `Web` 承担 `Brain` 创建、决策记录查看、复盘和 `AI` 费用相关能力。
-- 文档明确平台侧统一提供 `AI Gateway / Brain Service` 与相关支撑能力。
+- 文档明确平台侧统一提供 `AI Gateway / AI Brain Service(AI大脑)` 与相关支撑能力。
 - 文档明确当前不采用分阶段版本表述。
 - 文档明确一个钱包对应一个角色，一个角色对应一个唯一 `Brain` 实例。
 - 文档明确 `赚钱型 / 成长型 / 平衡型` 只是初始模板，不是固定终身模式。
