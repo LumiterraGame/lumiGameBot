@@ -2,7 +2,7 @@
 
 ## 项目定位与规划依据
 
-本仓库 `lumiGameBot` 当前主要交付 **`apps/aiBot`**：`AIBot(机器人)` 的 Web 创建与管理（`Next.js` + `pages/api` + `PostgreSQL`）、钱包连接（`wagmi`）与领域消息类型。产品愿景与平台侧总架构仍以 **`plans/001`～`plans/005`** 为准；`plans/` 与代码不一致时，**先改 `plans/` 再改本文件**。
+本仓库 `lumiGameBot` 当前主要交付 **`apps/aiBot`**：`AIBot(机器人)` 的 Web 创建与管理（`Next.js` + `pages/api` + `PostgreSQL`）、钱包连接（`wagmi`）与领域消息类型。产品愿景与平台侧总架构仍以 **`plans/001`～`plans/006`** 为准；`plans/` 与代码不一致时，**先改 `plans/` 再改本文件**。
 
 术语优先使用 **`AIBot(机器人)`**、**`AI Brain Service(AI大脑)`**、**`AI Gateway`**、**`AIBotPolicyState`** 等（见各 plan）。勿在新文档中沿用旧称 `brain-web`、`brain-domain`、`apps/packages` monorepo。
 
@@ -29,6 +29,8 @@
 
 **`apps/aiBrainService`**：同级占位应用，后续承接 AI Brain 相关逻辑；**不是** `apps/aiBot/src` 下的子目录。
 
+**决策/任务流水（journal）**：写入主体为 **`apps/aiBrainService`**（沿 Decision 路径落库）；`apps/aiBot` **不**重复实现大脑侧业务库写入；经 BFF 转发时仍由 Brain 写入。详见 **`plans/006_AI大脑服务与决策分层落地.md` §4.2**。
+
 ## 当前实现要点（与 `plans/005` 一致）
 
 - **无**服务端钱包签名会话、**无** `/api/auth/*`；`POST/PATCH /api/bots/*` 依赖请求体 **`walletAddress`**（信任前端，生产需另加鉴权）。
@@ -53,6 +55,19 @@ yarn test
 
 - 默认 **TypeScript**，2 空格缩进。
 - 页面与 API 放 `src/pages`；DTO 放 `src/message`；DB 访问只经 **`src/dbInterface`**；勿把 DB 与 UI 状态混在同一模块。
+
+## 执行原则（固化）
+
+- 当用户明确给出对标项目或参考实现（例如 `lumiterrator-v2`）时，**优先按参考项目的真实实现复用与对齐**，不要先做自定义简化版或“更优雅”的重写。
+- 当用户要求“全部按照某项目实现”时，默认含义是：
+  - 先对齐流程
+  - 再对齐状态模型
+  - 再对齐组件边界
+  - 最后才考虑抽象与优化
+- 优先减少无必要的目录层级、服务层跳转、表拆分和接口绕转；若一个实现可以直接放在 API 文件中且不会明显损害可读性，则优先选择更短的阅读路径。
+- 页面默认以**正式操作页面**为目标，不使用测试导航页、占位链接页或“临时可用页”作为交付形态，除非用户明确要求。
+- 钱包连接、登录、状态切换这类关键链路，若仓库已存在明确参考实现，必须先逐文件核对再动手实现，不能凭记忆近似复刻。
+- `plans/` 中的产品层、架构层、开发计划层必须严格分离；实现时不得把产品判断、架构假设、临时实现细节混写在同一层文档中。
 
 ## 测试与验收
 
