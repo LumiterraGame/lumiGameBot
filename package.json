@@ -8,8 +8,12 @@
   "scripts": {
     "dev:aiBot": "yarn workspace ai-bot dev",
     "dev:aiBrainService": "yarn workspace ai-brain-service dev",
-    "build": "yarn workspace ai-bot build",
-    "lint": "yarn workspace ai-bot lint",
+    "build": "yarn workspace ai-bot build && yarn workspace ai-brain-service build",
+    "build:aiBot": "yarn workspace ai-bot build",
+    "build:aiBrainService": "yarn workspace ai-brain-service build",
+    "lint": "yarn workspace ai-bot lint && yarn workspace ai-brain-service lint",
+    "lint:aiBot": "yarn workspace ai-bot lint",
+    "lint:aiBrainService": "yarn workspace ai-brain-service lint",
     "test": "yarn workspace ai-bot test"
   }
 }
