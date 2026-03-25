@@ -15,8 +15,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<QueryAIBotRespo
       res.setHeader("Allow", "GET");
       return sendJson(res, 405, { error: "Method not allowed" });
     }
-
     const raw = req.query.walletAddress;
+    console.log("query bot by wallet address:", raw);
     const walletAddress = typeof raw === "string" ? raw : Array.isArray(raw) ? raw[0] : "";
     if (!walletAddress?.trim() || !isAddress(walletAddress.trim())) {
       throw new BadRequestError("Invalid wallet address");

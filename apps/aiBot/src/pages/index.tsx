@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { useAccount, useDisconnect } from "wagmi";
 import { useWalletModal } from "@/components/WalletModal/useWalletModal";
 import { requestJson } from "@/lib/requestJson";
@@ -427,6 +428,7 @@ function WalletTrigger(props: {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<ConsoleTab>("current");
   const [bot, setBot] = useState<AIBot | null>(null);
   const [createForm, setCreateForm] = useState<CreateFormState>(() => createCreateDefaults());
@@ -586,6 +588,18 @@ export default function HomePage() {
       setActiveTab("current");
     }
   }, [bot, activeTab]);
+
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+
+    const rawTab = router.query.tab;
+    const tab = typeof rawTab === "string" ? rawTab : Array.isArray(rawTab) ? rawTab[0] : null;
+    if (tab === "current" || tab === "create" || tab === "update") {
+      setActiveTab(tab);
+    }
+  }, [router.isReady, router.query.tab]);
 
   function renderCurrentPanel() {
     const rows: Array<{ label: string; value: string; empty: boolean }> = [
