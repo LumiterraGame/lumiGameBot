@@ -5,6 +5,13 @@ import HomePage from "@/pages/index";
 import { WalletModalProvider } from "@/components/WalletModal/WalletModalProvider";
 import { useWalletModal } from "@/components/WalletModal/useWalletModal";
 
+vi.mock("next/router", () => ({
+  useRouter: () => ({
+    isReady: true,
+    query: {}
+  })
+}));
+
 const wagmiState = vi.hoisted(() => ({
   address: undefined as `0x${string}` | undefined,
   isConnected: false,

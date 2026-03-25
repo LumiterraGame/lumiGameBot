@@ -2,14 +2,14 @@
 
 ## 项目定位与规划依据
 
-本仓库 `lumiGameBot` 当前主要交付 **`apps/aiBot`**：`AIBot(机器人)` 的 Web 创建与管理（`Next.js` + `pages/api` + `PostgreSQL`）、钱包连接（`wagmi`）与领域消息类型。产品愿景与平台侧总架构仍以 **`plans/001`～`plans/006`** 为准；`plans/` 与代码不一致时，**先改 `plans/` 再改本文件**。
+本仓库 `lumiGameBot` 当前主要交付 **`apps/aiBot`**：`AIBot(机器人)` 的当前最小管理壳（`Next.js` + `pages/api` + `PostgreSQL`）、钱包连接（`wagmi`）与领域消息类型。产品定位与技术框架以 **`docs/lumiterra-aibot-product-plan.md`** 为唯一事实源；`plans/` 负责把该文档拆成产品/架构/阶段计划。`docs/`、`plans/` 与代码不一致时，**先改 `docs/` 或 `plans/`，再改本文件**。
 
 术语优先使用 **`AIBot(机器人)`**、**`AI Brain Service(AI大脑)`**、**`AI Gateway`**、**`AIBotPolicyState`** 等（见各 plan）。勿在新文档中沿用旧称 `brain-web`、`brain-domain`、`apps/packages` monorepo。
 
 ## 仓库边界
 
 - **本仓库**：`apps/aiBot`（主应用）+ `apps/aiBrainService`（占位）+ `plans/`。
-- **不在本仓库**：`Unity Client` / 游戏运行时（路径仍为 **`/Users/44alex/work/meland/odyssey-v2/unity-client-v2`**），勿迁入 Unity 代码。
+- **不在本仓库**：`Unity Client` / 游戏运行时（当前权威参考路径为 **`/Users/44alex/work/meland/odyssey-v2/unity-client-v2-aibot`**，见 `docs/lumiterra-aibot-product-plan.md`），勿迁入 Unity 代码。
 
 ## `apps/aiBot` 目录（以 `src/` 为中心）
 
@@ -65,6 +65,7 @@ yarn test
   - 再对齐组件边界
   - 最后才考虑抽象与优化
 - 优先减少无必要的目录层级、服务层跳转、表拆分和接口绕转；若一个实现可以直接放在 API 文件中且不会明显损害可读性，则优先选择更短的阅读路径。
+- 默认不做过度开发；实现以“满足当前需求的最小充分方案”为优先，避免为假设中的未来需求提前引入复杂抽象、额外泛化或预优化。代码需要在性能与可读性之间取得最佳平衡，优先选择易读、稳定、性能足够且后续容易演进的方案。
 - 页面默认以**正式操作页面**为目标，不使用测试导航页、占位链接页或“临时可用页”作为交付形态，除非用户明确要求。
 - 钱包连接、登录、状态切换这类关键链路，若仓库已存在明确参考实现，必须先逐文件核对再动手实现，不能凭记忆近似复刻。
 - `plans/` 中的产品层、架构层、开发计划层必须严格分离；实现时不得把产品判断、架构假设、临时实现细节混写在同一层文档中。

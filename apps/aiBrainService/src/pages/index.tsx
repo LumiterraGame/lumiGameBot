@@ -92,8 +92,10 @@ export default function HomePage() {
         <section>
           <h1 style={{ margin: 0, fontSize: 42 }}>AI Brain Service</h1>
           <p style={{ marginTop: 12, color: "#a7b2c3", lineHeight: 1.6 }}>
-            Minimal GPT integration for Postman and browser testing. The main HTTP endpoint is
-            <code style={{ marginLeft: 8 }}>/api/brain/respond</code>.
+            Temporary free-text GPT bridge for Postman and browser testing. This is not the final
+            structured strategy API. Current endpoints:
+            <code style={{ marginLeft: 8 }}>/api/brain/respond</code>
+            <code style={{ marginLeft: 8 }}>/api/brain/decision</code>.
           </p>
         </section>
 

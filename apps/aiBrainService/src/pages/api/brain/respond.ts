@@ -1,4 +1,4 @@
-// Generate one brain response with GPT.
+// Temporary free-text GPT bridge for local experimentation.
 // POST /api/brain/respond
 // Request JSON example:
 // {"model":"gpt-5.4","input":"Summarize the next best action for this role.","systemPrompt":"You are an AI brain for a game bot.","maxOutputTokens":500}
