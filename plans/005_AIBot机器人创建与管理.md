@@ -1,87 +1,112 @@
-## 时间: 2026-03-20 19:08:00 CST（2026-03-20 同步代码：单页控制台、无 templates API、无 `/api/auth/*`）
+## 时间: 2026-03-25 CST（按 `docs/lumiterra-aibot-product-plan.md` 重新对齐）
 
-## 任务: AIBot(机器人)创建管理与前端钱包
+## 任务: 当前仓库中的 AIBot 创建与管理壳
 
 # 最终任务包
 
 ## 目标
 
-完成 `apps/aiBot` 侧「连接钱包 + AIBot(机器人)创建与管理」的第一版可用能力，让用户可以：
+说明 `apps/aiBot` 当前这部分代码在整个权威产品方案中的位置。它不是最终完整产品控制台，只是当前仓库里已经存在的最小 `AIBot` 注册与管理壳。
 
-- 连接钱包（`wagmi`，无独立服务端登录验签）
-- 查询当前钱包是否已有 `AIBot(机器人)`
-- 创建唯一 `AIBot(机器人)`
-- 查看 `AIBot(机器人)` 摘要
-- 编辑 `AIBot(机器人)` 的基础配置
+## 本文件的权威来源
 
-## 范围内
+- 产品最终形态以 [docs/lumiterra-aibot-product-plan.md](/Users/44alex/work/meland/odyssey-v2/lumiGameBot/docs/lumiterra-aibot-product-plan.md) 为准。
+- 该文档定义的正式控制台形态包含：
+  - Unity 内 `AIBot Panel`
+  - `lumiterrator-v2` 中的 Dashboard / Strategy / Replay / Pricing / Subscription
+- 本文件只描述当前 `apps/aiBot` 已实现的最小范围。
 
-- 前端页面：首页单页控制台 `apps/aiBot/src/pages/index.tsx`（`wagmi` 连接钱包；**Current / Create / Update** 三 Tab；Create 在已有机器人时禁用；表单内决策类型为下拉框，默认平衡型）
-- 辅助页面：`/health` 说明文案页（`pages/health.tsx`）
-- 后端 API：
-  - `GET /api/bots/query/[walletAddress]`（仅校验地址格式，无会话）
-  - `POST /api/bots/create`、`PATCH /api/bots/update`：**请求体携带 `walletAddress`**，服务端校验地址格式后操作数据库（**信任调用方声明的钱包**，不做 EIP-191 验签）
-- 数据存储：仅 `aibots` 表
-- 前后端代码按 `apps/aiBot` 应用结构落地
-- `apps/aiBrainService` 仅保留同级目录占位
+## 当前范围
 
-## 范围外
+当前 `apps/aiBot` 只覆盖：
 
-- 不在本里程碑内实现真实 `AI` 决策
-- 不在本里程碑内实现与 `Unity Client` 的正式对接
-- 不在本里程碑内实现正式 `AI Brain Service(AI大脑)` 业务逻辑
-- 不提供 `login_nonces`、HMAC 会话 cookie、`/api/auth/*`
+- 连接钱包
+- 查询当前钱包是否已有 `AIBot`
+- 创建唯一 `AIBot`
+- 查看 `AIBot` 摘要
+- 编辑 `AIBot` 的基础配置
 
-## 页面与 API 规划（当前实现）
+## 当前实现
 
-### API（已实现）
+### 页面
 
-- `GET /api/bots/query/[walletAddress].ts`
-- `POST /api/bots/create.ts`
-- `PATCH /api/bots/update.ts`
-- `GET /api/health.ts`、`GET /api/db/health.ts`
+- 首页单页控制台 `apps/aiBot/src/pages/index.tsx`
+- `Current / Create / Update` 三个 Tab
+- `wagmi` 钱包连接
 
-### 目录落点
+### API
 
-- `apps/aiBot/src/pages/index.tsx`（主控制台）
-- `apps/aiBot/src/pages/_app.tsx`（`WagmiProvider`、钱包弹层）
-- `apps/aiBot/src/components/WalletModal/*`（连接钱包 UI）
-- `apps/aiBot/src/lib/wallet/*`（链配置、`wagmi` config、连接器）
-- `apps/aiBot/src/message/message.ts`（机器人创建/查询/更新 DTO）
-- `apps/aiBot/src/message/data.ts`（领域枚举与 `AIBot` 实体）
-- `apps/aiBot/src/dbInterface/aibot.ts`、`interface.ts`
-- `apps/aiBot/src/db/schema.ts`、`types.ts`、`pgdb.ts`、`db-smoke.ts`
-- `apps/aiBot/src/db/001_init_aibot_tables.sql`（仅 `aibots`）
-- `apps/aiBot/.env.example`：`AIBOT_POSTGRES_*`；可选 `NEXT_PUBLIC_CHAIN_ID`、`NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`（默认见 `lib/wallet/chain.ts`、`config.ts`）
+- `GET /api/bots/query/[walletAddress]`
+- `POST /api/bots/create`
+- `PATCH /api/bots/update`
+- `GET /api/health`
+- `GET /api/db/health`
 
-### 自动化测试
+### 数据
 
-- `apps/aiBot/tests/api-bots.test.ts`（bots API）
-- `apps/aiBot/tests/home-console.test.tsx`（首页与 Tab）
+- 当前只使用 `aibots` 表
 
-## 数据模型规划
+字段：
 
-### `AIBot`（表 `aibots`）
-
-- `wallet_address`（主键，一钱包一行）
+- `wallet_address`
 - `bot_name`
-- `decision_type`（`profit` | `growth` | `balanced`）
-- `run_status`（`running` | `paused` | `stopped`；新建默认 `stopped`）
-- `description`（预留描述，默认空串）
-- `created_at` / `updated_at`
+- `decision_type`
+- `run_status`
+- `description`
+- `created_at`
+- `updated_at`
 
-## 安全说明（与旧版对比）
+## 当前不代表的能力
 
-- **旧版**：钱包签名 + HMAC cookie 会话；`create/update` 依赖会话中的钱包。
-- **当前**：无服务端会话；`POST/PATCH` 以 `body.walletAddress` 为准（**仅适合开发/内网或后续再接入鉴权**）。
+当前 `apps/aiBot` **不代表**权威文档里的这些正式能力已经完成：
+
+- `Bot Dashboard`
+- `Strategy Template`
+- `Opportunity Replay`
+- `Daily Profit Report`
+- `Bot Pricing`
+- `Bot Subscription`
+- `Billing History`
+- `Bot API` 完整决策接口
+- `entitlement` 完整校验
+- `AI Advisor`
+- `Backtest and Replay`
+
+## 与收费和授权的关系
+
+- 当前 `aibots` 表只表示“该钱包下存在一个 `AIBot` 注册信息”。
+- 它不等于：
+  - Bot 已有正式使用权
+  - Bot 已通过 entitlement 校验
+  - Bot 已可执行自动化赚钱动作
+
+后续至少需要补：
+
+- `plan_id`
+- `plan_name`
+- `billing_mode`
+- `enabled_money_loops`
+- `enabled_ai_features`
+- `expire_at`
+- `grace_expire_at`
+- `entitlement_status`
+
+## 与权威技术框架的关系
+
+- 当前仓库里的 `apps/aiBot` 更适合被视为：
+  - 最小注册表
+  - 最小 BFF
+  - 临时管理壳
+- 它不应再被写成“正式完整产品控制台”的唯一落点。
+
+## 当前安全边界
+
+- 当前仍然没有服务端钱包验签会话。
+- `POST / PATCH` 仍然信任 `walletAddress` 请求体。
+- 因此它只适合作为当前开发态或后续重构前的最小壳。
 
 ## 验收标准
 
-- 当前钱包无 `AIBot(机器人)` 时可完成创建（请求体含 `walletAddress`）
-- 当前钱包有 `AIBot(机器人)` 时可读取和编辑
-- 一个钱包只能创建一个 `AIBot(机器人)`
-- 当前代码目录与本计划中的 `apps/aiBot` 口径一致
-
-## 待确认问题
-
-- 当前围绕 `apps/aiBot` 交付范围，无新增待确认问题
+- 本文件明确把 `apps/aiBot` 定义为“当前最小实现壳”，而不是最终完整产品形态。
+- 本文件与权威文档中的 Web / Dashboard 规划不再冲突。
+- 本文件明确“创建 AIBot”与“Bot 可运行”是两件事。
