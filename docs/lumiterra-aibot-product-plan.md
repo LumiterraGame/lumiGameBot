@@ -142,10 +142,20 @@
 
 借鉴重点：
 
-- 工具目录
+- Unity 执行侧操作原子目录
 - 连接管理器
 - 消息存储
 - 主程序只做装配
+
+在 Lumiterra 里的正式术语应收敛为 Unity 执行侧的 `操作原子(Atoms)`，而不是 MCP 风格的 `Tool Catalog`。
+
+建议原子分组：
+
+- `TaskAtoms`
+- `FarmingAtoms`
+- `RecoveryAtoms`
+- `WalletAtoms`
+- `NavigationAtoms`
 
 ## 4. 产品形态规划
 
@@ -282,6 +292,23 @@ Unity 客户端增加 `AIBot` 面板，包含：
 ### 7.2 系统架构
 
 `Unity Client + AIBot Panel + Bot Runtime + State Collector + Action Executor + Safety Guard + Bot API + Billing and Entitlement + Strategy Engine + Backtest and Replay + lumiterrator dashboard`
+
+### 7.3 Unity 执行侧操作原子
+
+Unity 执行侧建议使用：
+
+- `Atoms/TaskAtoms`
+- `Atoms/FarmingAtoms`
+- `Atoms/RecoveryAtoms`
+- `Atoms/WalletAtoms`
+- `Atoms/NavigationAtoms`
+
+每个操作原子只暴露：
+
+- 输入 schema
+- 前置检查
+- 执行逻辑
+- 结果结构
 
 ## 8. 进化路线
 

@@ -11,6 +11,7 @@
 ## 本文件的权威来源
 
 - 产品最终形态以 [docs/lumiterra-aibot-product-plan.md](/Users/44alex/work/meland/odyssey-v2/lumiGameBot/docs/lumiterra-aibot-product-plan.md) 为准。
+- 如果引用 Unity 执行侧目录或执行单元，统一使用 `操作原子(Atoms)` 术语，不再使用 `Tool Catalog / *Tools`。
 - 该文档定义的正式控制台形态包含：
   - Unity 内 `AIBot Panel`
   - `lumiterrator-v2` 中的 Dashboard / Strategy / Replay / Pricing / Subscription

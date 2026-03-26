@@ -43,6 +43,7 @@
 1. 如果产品定位要改，先改 [docs/lumiterra-aibot-product-plan.md](/Users/44alex/work/meland/odyssey-v2/lumiGameBot/docs/lumiterra-aibot-product-plan.md)。
 2. `plans/001` 只同步“继承关系”，不再创造第二套产品文案。
 3. 其它 `plans` 只能引用或拆解 `docs` 的产品结论，不能重新定义产品定位。
+4. 如果涉及 Unity 执行侧目录或执行单元，统一使用 `操作原子(Atoms)` 术语，不再使用 `Tool Catalog / *Tools` 作为正式口径。
 
 ## 当前正式产品结论索引
 
